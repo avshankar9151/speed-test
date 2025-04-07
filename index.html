@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test</title>
+</head>
+<body>
+    <script>
+        const speedTestMaxDuration = 60; // Maximum duration for the speed test in seconds
+        const speedTestMaxIterations = 10; // Number of iterations for the speed test
+        
+        var downloadSpeeds = []; // Array to store download speeds
+        var speedTestStartTime = new Date().getTime();
+
+        function downloadSpeedTest2(fileSize=1024*1024, iteration=0) { // Default file size is 1MB
+            const startTime = new Date().getTime();
+            const image = new Image();
+            image.src = "/api/?action=download&filesize=" + fileSize; // Replace with a valid image URL
+            console.log("Image URL: " + image.src);
+            image.onload = function() {
+                const endTime = new Date().getTime();
+                const duration = (endTime - startTime) / 1000; // in seconds
+                // const fileSize = 5000000; // Example file size in bytes (5MB)
+                const speedMbps = (fileSize / duration) / (1024 * 1024); // Convert to Mbps
+                console.log("Your download speed is: " + speedMbps.toFixed(2) + " Mbps");
+                downloadSpeeds.push(speedMbps); // Store the speed in the array
+                const averageSpeed = downloadSpeeds.reduce((a, b) => a + b, 0) / downloadSpeeds.length; // Calculate average speed
+                console.log("Average download speed: " + averageSpeed.toFixed(2) + " Mbps");
+
+                
+                console.log(downloadSpeeds);
+
+                var speedTestEndTime = new Date().getTime();
+                var speedTestDuration = ((speedTestEndTime - speedTestStartTime) / 1000).toFixed(2); // in seconds
+                console.log("Speed test duration: " + speedTestDuration + " seconds");
+                console.log("Speed test iteration: " + iteration + " iteration(s)");
+                if (speedTestDuration < speedTestMaxDuration && iteration < speedTestMaxIterations) { // Minimum duration for speed test
+                    downloadSpeedTest(fileSize, iteration + 1); // Recursive call to continue the speed test
+                } else {
+                    console.log("Speed test completed.");
+                }
+            };
+            // image.onerror = function() {
+            //     console.error("Error loading image for speed test.");
+            // };
+        }
+
+        function downloadSpeedTest(fileSize = 10240 * 1024, iteration = 0) { // Default file size is 10MB
+            const xhr = new XMLHttpRequest();
+            const startTime = new Date().getTime();
+
+            xhr.open("GET", "/api/?action=download&filesize=" + fileSize, true);
+            xhr.responseType = "blob"; // Expect a binary response
+
+            xhr.onprogress = function (event) {
+                if (event.lengthComputable) {
+                    const percentComplete = (event.loaded / event.total) * 100;
+                    console.log(`Download progress: ${percentComplete.toFixed(2)}%`);
+                } else {
+                    console.log("Unable to compute progress information.");
+                }
+            };
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const endTime = new Date().getTime();
+                    const duration = (endTime - startTime) / 1000; // in seconds
+                    const speedMbps = (fileSize / duration) / (1024 * 1024); // Convert to Mbps
+                    console.log("Your download speed is: " + speedMbps.toFixed(2) + " MB/s");
+                    downloadSpeeds.push(speedMbps); // Store the speed in the array
+                    const averageSpeed = downloadSpeeds.reduce((a, b) => a + b, 0) / downloadSpeeds.length; // Calculate average speed
+                    console.log("Average download speed: " + averageSpeed.toFixed(2) + " MB/s");
+
+                    // Continue the test if conditions are met
+                    const speedTestEndTime = new Date().getTime();
+                    const speedTestDuration = ((speedTestEndTime - speedTestStartTime) / 1000).toFixed(2); // in seconds
+                    if (speedTestDuration < speedTestMaxDuration && iteration < speedTestMaxIterations) {
+                        downloadSpeedTest(fileSize, iteration + 1); // Recursive call
+                    } else {
+                        console.log("Speed test completed.");
+                    }
+                } else {
+                    console.error("Error: Failed to download the file.");
+                }
+            };
+
+            xhr.onerror = function () {
+                console.error("Error: Unable to complete the request.");
+            };
+
+            xhr.send();
+        }
+
+        function startSpeedTest() {
+            downloadSpeeds = []; // Array to store download speeds
+            speedTestStartTime = new Date().getTime();
+            downloadSpeedTest(); // Start the speed test
+        }
+
+        startSpeedTest(); // Call the function to start the speed test
+        // Function to handle the download speed test
+    </script>
+</body>
+</html>
