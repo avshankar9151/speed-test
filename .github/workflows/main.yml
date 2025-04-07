@@ -11,7 +11,10 @@ jobs:
     #needs: test  # This ensures that the deploy job runs only after the test job has completed successfully
     environment: production
     env:
+      VPS_HOST: ${{ vars.VPS_HOST }}
+      VPS_PROJECT_PATH: ${{ vars.VPS_PROJECT_PATH }}
       VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      VPS_USER: ${{ vars.VPS_SSH_USER }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
