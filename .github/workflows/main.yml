@@ -24,6 +24,7 @@ jobs:
       - name: Display Environment Variables is set or not
         run: |
           echo "hi"
+          echo ${{ vars }}
           echo $VPS_HOST
 
       - name: Add host key to known_hosts
