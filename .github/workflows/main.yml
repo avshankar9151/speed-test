@@ -24,12 +24,6 @@ jobs:
           echo "$VPS_SSH_KEY" > private_key
           chmod 600 private_key
 
-      - name: Display Environment Variables is set or not
-        run: |
-          echo "hi"
-          echo ${{ vars }}
-          echo $VPS_HOST
-
       - name: Add host key to known_hosts
         run: |
           mkdir -p ~/.ssh
