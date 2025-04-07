@@ -18,13 +18,17 @@ jobs:
       - name: Deploy to VPS
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-
+          
+      - name: Create Privare Key
         run: |
           echo "$VPS_SSH_KEY" > private_key
           chmod 600 private_key
 
-          # Add the host key to known_hosts
+      - name: Add host key to known_hosts
+        run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
           
+      - name: Upload the current directory to VPS
+        run: |
           scp -i private_key -o StrictHostKeyChecking=no -r ./* $VPS_SSH_USER@$VPS_HOST:$VPS_PROJECT_PATH
