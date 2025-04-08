@@ -32,3 +32,7 @@ jobs:
       - name: Upload the current directory to VPS
         run: |
           scp -i private_key -o StrictHostKeyChecking=no -r ./* $VPS_SSH_USER@$VPS_HOST:$VPS_PROJECT_PATH
+          ssh -i private_key -o StrictHostKeyChecking=no $VPS_SSH_USER@$VPS_HOST << EOF
+            cd $VPS_PROJECT_PATH
+            rm private_key
+          EOF
